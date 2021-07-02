@@ -31,7 +31,7 @@
   关闭selinux，在所有节点执行:
   ```sh
   setenforce 0
-  sed -i '7s/enforcing/disabled' /etc/sysconfig/selinux
+  sed -i '7s/enforcing/disabled/' /etc/sysconfig/selinux
   ```
     
 * ## **配置主机名**  
