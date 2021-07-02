@@ -116,8 +116,8 @@
     ```
     修改ceph.conf配置文件，允许删除pool，在最后添加如下配置:
     ```sh
-    echo "[mon]\
-    mon_allow_pool_delete = true" >> /etc/ceph/ceph.conf
+    echo -e "[mon]\n\
+    mon_allow_pool_delete = true" >> ceph.conf
     ```
     推送"ceph.conf"和"ceph.client.admin.keyring"拷贝到所有节点:
     ```sh
