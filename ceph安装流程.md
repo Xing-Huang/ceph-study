@@ -43,6 +43,16 @@
   hostnamectl set-hostname ceph-3
   hostnamectl set-hostname client
   ```
+* ## 修改域名解析文件
+* 修改域名解析文件，所有节点执行：
+* ```sh
+  echo "
+  172.22.92.10  controller
+  172.22.92.11  ceph-1
+  172.22.92.12  ceph-2
+  172.22.92.13  ceph-3
+  " >> /etc/hosts
+  ```
 * ## **配置ntp**
   配置ntp，ceph-1为ntp服务主节点，在ceph-1节点执行:
   ```sh
@@ -67,7 +77,7 @@
 * ## **配置免密登录**
   设置controller节点免密登录ceph节点，在controller节点执行:
   ```sh
-  ssh-keygen
+  ssh-keygen -t rsa
   ssh-copy-id root@ceph-1
   ssh-copy-id root@ceph-2
   ssh-copy-id root@ceph-3
