@@ -114,19 +114,24 @@
     mkdir cluster && cd cluster
     ceph-deploy new --cluster-network=172.22.92.0/24 --public-network=172.22.94.0/24 ceph-1 ceph-2 ceph-3
     ```
+
     修改ceph.conf配置文件，允许删除pool，在最后添加如下配置:
     ```sh
     echo -e "[mon]\n\
     mon_allow_pool_delete = true" >> ceph.conf
     ```
+
+    初始化监视器并收集密钥：
+    ```sh
+    ceph-deploy mon create-initial
+    ```
+
     推送"ceph.conf"和"ceph.client.admin.keyring"拷贝到所有节点:
     ```sh
     ceph-deploy --overwrite-conf admin controller ceph-1 ceph-2 ceph-3 client
     ```
-    运行mon节点：
-    ```sh
-    ceph deploy mon create initial
-    ```
+
+
     查看配置是否成功:
     ```sh
     ceph -s
