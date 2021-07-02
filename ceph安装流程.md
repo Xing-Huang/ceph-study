@@ -9,7 +9,7 @@
 
 
 # **集群环境规划**
-| 集群 | Public Network | Cluster Network|Services|
+| 集群 | Cluster Network | Public Network|Services|
 |:-|:-:|:-:|:-:|
 | controller| 172.22.92.10| 172.22.94.10|ceph-deploy|
 | ceph-1| 172.22.92.11| 172.22.94.11|osd.0, mon.ceph-1|
@@ -44,13 +44,13 @@
   hostnamectl set-hostname client
   ```
 * ## 修改域名解析文件
-* 修改域名解析文件，所有节点执行：
-* ```sh
-  echo "
-  172.22.92.10  controller
-  172.22.92.11  ceph-1
-  172.22.92.12  ceph-2
-  172.22.92.13  ceph-3
+  修改域名解析文件，所有节点执行：
+  ```sh
+  echo "\
+  172.22.92.10  controller\
+  172.22.92.11  ceph-1\
+  172.22.92.12  ceph-2\
+  172.22.92.13  ceph-3\
   " >> /etc/hosts
   ```
 * ## **配置ntp**
@@ -92,39 +92,47 @@
 * ## **安装ceph软件**
     安装ceph和ceph-radosgw，在所有节点上执行:
     ```sh
-    sudo yum install -y epel-release ceph ceph-radosgw
+    sudo yum install -y epel-release 
+    sudo yum install -y ceph ceph-radosgw
     ```
-    安装ceph-deploy，在deploy节点上执行:
-    ```sh
-    sudo yum install ceph-deploy
-    ```
-    在各节点查看版本
+    在各节点查看版本:
     ```sh
     ceph -v 
     ```
+    获取的版本信息:
+    ```
+    ceph version 12.2.13 (584a20eb0237c657dc0567da126be145106aa47e) luminous (stable)
+    ```
+    安装ceph-deploy，在deploy节点上执行:
+    ```sh
+    sudo yum install -y ceph-deploy
+    ```
 * ## **部署mon节点**
     **以下指令在deploy节点执行**  
-    创建集群:
+    创建集群，在ceph-1、ceph-2、ceph-3上添加mon:
     ```sh
     mkdir cluster && cd cluster
-    ceph-deploy new cluster_network=172.22.92.0/24 public_network=172.22.94.0/24 ceph-1 ceph-2 ceph-3
-    ceph deploy mon create initial
+    ceph-deploy new --cluster-network=172.22.92.0/24 --public-network=172.22.94.0/24 ceph-1 ceph-2 ceph-3
     ```
     修改ceph.conf配置文件，允许删除pool，在最后添加如下配置:
     ```sh
-    vim ceph.conf
+    echo "[mon]\
+    mon_allow_pool_delete = true" >> /etc/ceph/ceph.conf
     ```
-    ```
-    [mon]
-    mon_allow_pool_delete = true
-    ```
-    推送"ceph.conf"和"ceph.client.admin.keyring"拷贝到ceph节点和client节点:
+    推送"ceph.conf"和"ceph.client.admin.keyring"拷贝到所有节点:
     ```sh
-    ceph-deploy --overwrite-conf admin deploy ceph-1 ceph-2 ceph-3 client
+    ceph-deploy --overwrite-conf admin controller ceph-1 ceph-2 ceph-3 client
+    ```
+    运行mon节点：
+    ```sh
+    ceph deploy mon create initial
     ```
     查看配置是否成功:
     ```sh
     ceph -s
+    ```
+    获取的信息:
+    ```
     ```
 * ## **部署mgr节点**
     **以下指令在deploy节点执行**
