@@ -51,7 +51,7 @@
   172.22.92.11  ceph-1\
   172.22.92.12  ceph-2\
   172.22.92.13  ceph-3\
-  " >> /etc/hosts
+  172.22.92.14  client" >> /etc/hosts
   ```
 * ## **配置ntp**
   配置ntp，ceph-1为ntp服务主节点，在ceph-1节点执行:
@@ -81,6 +81,7 @@
   ssh-copy-id root@ceph-1
   ssh-copy-id root@ceph-2
   ssh-copy-id root@ceph-3
+  ssh-copy-id root@client
   ```
 * ## **配置ceph镜像源**
   配置清华镜像源,在所有节点执行:
@@ -138,6 +139,20 @@
     ```
     获取的信息:
     ```
+    cluster:
+      id:     e268e920-6f88-4f61-8d16-a6c97bbcec95
+      health: HEALTH_OK
+  
+    services:
+      mon: 3 daemons, quorum ceph-1,ceph-2,ceph-3
+      mgr: no daemons active
+      osd: 0 osds: 0 up, 0 in
+  
+    data:
+      pools:   0 pools, 0 pgs
+      objects: 0 objects, 0B
+      usage:   0B used, 0B / 0B avail
+      pgs:    
     ```
 * ## **部署mgr节点**
     **以下指令在deploy节点执行**
@@ -148,6 +163,23 @@
     查看MGR是否部署成功：
     ```sh
     ceph -s
+    ```
+    获取的信息:
+    ```
+    cluster:
+      id:     e268e920-6f88-4f61-8d16-a6c97bbcec95
+      health: HEALTH_OK
+  
+    services:
+      mon: 3 daemons, quorum ceph-1,ceph-2,ceph-3
+      mgr: ceph-1(active), standbys: ceph-3, ceph-2
+      osd: 0 osds: 0 up, 0 in
+  
+    data:
+      pools:   0 pools, 0 pgs
+      objects: 0 objects, 0B
+      usage:   0B used, 0B / 0B avail
+      pgs:     
     ```
 * ## **部署osd节点**
     查看各节点可用的硬盘，在各个ceph节点执行:
@@ -160,6 +192,30 @@
     ceph-deploy osd create ceph-2 --data /dev/vdb
     ceph-deploy osd create ceph-3 --data /dev/vdb
     ```
+
+    查看osd是否部署成功：
+    ```sh
+    ceph -s
+    ```
+
+    获取的信息:
+    ```
+    cluster:
+      id:     e268e920-6f88-4f61-8d16-a6c97bbcec95
+      health: HEALTH_OK
+  
+    services:
+      mon: 3 daemons, quorum ceph-1,ceph-2,ceph-3
+      mgr: ceph-1(active), standbys: ceph-3, ceph-2
+      osd: 3 osds: 3 up, 3 in
+  
+    data:
+      pools:   0 pools, 0 pgs
+      objects: 0 objects, 0B
+      usage:   3.01GiB used, 297GiB / 300GiB avail
+      pgs:   
+    ```
+    
 # 验证ceph
 * **创建存储池**  
     **以下所有指令在client节点执行**
